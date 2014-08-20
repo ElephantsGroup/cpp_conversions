@@ -1,0 +1,504 @@
+#include<iostream>
+#include<fstream>
+#include<typeinfo>
+#include<bitset>
+#include<limits.h>
+#include<limits>
+#include<string>
+#include<time.h>
+#include <cmath>
+using namespace std;
+
+//******************** Pre-processor componet ******************************
+#define _PROMOTION
+#define _CORRESPOND
+#define _CONVERTING_SHORTER
+//#define _Print_To_Cmd
+//**************************************************************************
+
+static unsigned int Num_Sample = 0;
+static ofstream fout ("Result_Conver.txt",ios::out);
+
+
+template<class T>
+T eg_rand()
+{
+	srand(time(NULL));
+	for(unsigned int i=0; i<rand()%10; i++)
+		rand();
+
+	if(sizeof(T) == sizeof(int))
+		return rand();
+	else if(sizeof(T) < sizeof(int))
+		return rand() % numeric_limits<T>::max();
+	else
+	{
+		T result = 0;
+		for(unsigned int i=0; i<sizeof(T)/sizeof(int); i++)
+		{
+			result<<(sizeof(int)*8);
+			result += rand();
+		}
+		return result;
+	}
+}
+
+template <class T1,class T2>
+void Print(T1 from , T2 to,char * explain=" ")
+{
+	cout<<"_______________________________________________________________________________________________________"<<endl;
+	Num_Sample++;
+#ifdef _Print_To_Cmd
+	cout<<"NO.Sample : "<<Num_Sample<<endl;
+	cout<<"Your input number had size of "<<sizeof(T1)<<" Byte"<<endl;
+	cout<<"Your output number had size of "<<sizeof(T2)<<" Byte"<<endl;
+	cout<<"Conver "<<explain<<"  "<<typeid(T1).name()<<" To "<<typeid(T2).name()<<endl;
+	cout<<typeid(T1).name()<<" : "<<from<<" >>>> Convert To >>>>>> "<<typeid(T2).name()<<" : "<<to<<endl;
+#else
+	cout<<"Sample "<<Num_Sample<<" Complete. See Result_Conver.txt "<<endl;
+#endif
+	//bitset</*sizeof(T1)*8*/32> fromBit(from);
+	//cout<<fromBit<<endl;
+	//std::bitset<sizeof(T2)*8> toBit(to);
+	//string  frombit = fromBit.to_string();
+	//cout<< fromBit <<"            "<<endl;
+	//cout<<typeid(T1).name()<<" : "<<fromBit<<" >>>> Convert To >>>>>> "<<typeid(T2).name()<<" : "<<toBit<<endl;
+
+	//toBit.reset();
+	cout<<"_______________________________________________________________________________________________________"<<endl;
+
+	//*********************** Printing in file ****************************
+
+	fout<<"_______________________________________________________________________________________________________"<<endl;
+	fout<<"NO.Sample : "<<Num_Sample<<endl;
+	fout<<"Your input number had size of "<<sizeof(T1)<<" Byte"<<endl;
+	fout<<"Your output number had size of "<<sizeof(T2)<<" Byte"<<endl;
+	fout<<"Conver "<<explain<<"  "<<typeid(T1).name()<<" To "<<typeid(T2).name()<<endl;
+	fout<<typeid(T1).name()<<" : "<<from<<" >>>> Convert To >>>>>> "<<typeid(T2).name()<<" : "<<to<<endl;
+
+	//std::bitset<sizeof(T1)*8> fromBit(from);
+	//std::bitset<sizeof(T2)*8> toBit(to);
+	//fout<<typeid(T1).name()<<" : "<<fromBit<<" >>>> Convert To >>>>>> "<<typeid(T2).name()<<" : "<<toBit<<endl;
+	fout<<"_______________________________________________________________________________________________________"<<endl;
+}
+
+template<class T1,class T2>
+T2 convert(bool flag  , T1 from = 0, T2 to = 0) 
+{
+	if(flag == true)
+	{
+		to = from;
+		Print<T1,T2>(from,to);
+		return to;
+	}
+	from = numeric_limits<T1>::min();
+	to = from;
+	Print<T1,T2>(from,to," Min ");
+
+	from = numeric_limits<T1>::max();
+	to = from;
+	Print<T1,T2>(from,to," Max ");
+
+	from = eg_rand<T1>();
+	to = from;
+	Print<T1,T2>(from,to," Random ");
+}
+
+//_________________ Converting function whitout input argiman ________________________
+template<class T1,class T2>
+T2 convert(T1 from = 0, T2 to = 0) 
+{
+
+	from = numeric_limits<T1>::min();
+	to = from;
+	Print<T1,T2>(from,to," Min ");
+
+	from = numeric_limits<T1>::max();
+	to = from;
+	Print<T1,T2>(from,to," Max ");
+
+	from = eg_rand<T1>();
+	to = from;
+	Print<T1,T2>(from,to," Random ");
+
+	return to;
+}
+
+
+int main()
+{
+
+	cout<<"size of char : "<<sizeof(char)<<endl;
+	cout<<"size of short : "<<sizeof(short)<<endl;
+	cout<<"size of int : "<<sizeof(int)<<endl;
+	cout<<"size of long : "<<sizeof(long)<<endl;
+	cout<<"size of long long : "<<sizeof(long long)<<endl;
+
+	fout<<"size of char : "<<sizeof(char)<<endl;
+	fout<<"size of short : "<<sizeof(short)<<endl;
+	fout<<"size of int : "<<sizeof(int)<<endl;
+	fout<<"size of long : "<<sizeof(long)<<endl;
+	fout<<"size of long long : "<<sizeof(long long)<<endl;
+	fout<<"________________________________________________________________"<<endl;
+
+	cout<<"___________________________________________________"<<endl;
+	cout<<"What do you want to do ? "<<endl;
+	cout<<"1. If you want  Promotion Convertion Press 1"<<endl;
+	cout<<"2. If you want  Correspond Convertion Press 2"<<endl;
+	cout<<"3. If you want  Converting to shorter size Press 3"<<endl;
+	cout<<"4. If you want  all of them Press 4"<<endl;
+
+	unsigned short num_input = 0;
+	cin>>num_input;
+
+	//***********************************  Promotioning  ******************************************* 
+#ifdef _PROMOTION
+	if (num_input == 1 || num_input == 4)
+	{
+		fout<<"***********************************  Promotioning  *******************************************"<<endl;
+		// convert char to longer integer
+		if(sizeof(char) < sizeof(short))
+		{
+			signed char sc = 0;
+			unsigned char uc = 0;
+			signed short ss = 0;
+			unsigned short us = 0;
+
+			convert<signed char, signed short>(sc, ss);
+			convert<signed char, unsigned short>(sc, us);
+			convert<unsigned char, signed short>(uc, ss);
+			convert<unsigned char, unsigned short>(uc, us);
+		}
+		if(sizeof(char) < sizeof(int))
+		{
+			signed char sc = 0;
+			unsigned char uc = 0;
+			signed int si = 0;
+			unsigned int ui = 0;
+
+			convert<signed char, signed int>(sc, si);
+			convert<signed char, unsigned int>(sc, ui);
+			convert<unsigned char, signed int>(uc, si);
+			convert<unsigned char, unsigned int>(uc, ui);
+		}
+		if(sizeof(char) < sizeof(long int))
+		{
+			signed char sc = 0;
+			unsigned char uc = 0;
+			signed long int sl = 0;
+			unsigned long int ul = 0;
+
+			convert<signed char, signed long int>(sc, sl);
+			convert<signed char, unsigned long int>(sc, ul);
+			convert<unsigned char, signed long int>(uc, sl);
+			convert<unsigned char, unsigned long int>(uc, ul);
+		}
+		if(sizeof(char) < sizeof(long long int))
+		{
+			signed char sc = 0;
+			unsigned char uc = 0;
+			signed long long int sll = 0;
+			unsigned long long int ull = 0;
+
+			convert<signed char, signed long long int>(sc, sll);
+			convert<signed char, unsigned long long int>(sc, ull);
+			convert<unsigned char, signed long long int>(uc, sll);
+			convert<unsigned char, unsigned long long int>(uc, ull);
+		}
+
+		// convert short to longer integer
+		if(sizeof(short) < sizeof(int))
+		{
+			signed short ss = 0;
+			unsigned short us = 0;
+			signed int si = 0;
+			unsigned int ui = 0;
+
+			convert<signed short, signed int>(ss, si);
+			convert<signed short, unsigned int>(ss, ui);
+			convert<unsigned short, signed int>(us, si);
+			convert<unsigned short, unsigned int>(us, ui);
+		}
+		if(sizeof(short) < sizeof(long int))
+		{
+			signed short ss = 0;
+			unsigned short us = 0;
+			signed long int sl = 0;
+			unsigned long int ul = 0;
+
+			convert<signed short, signed long int>(ss, sl);
+			convert<signed short, unsigned long int>(ss, ul);
+			convert<unsigned short, signed long int>(us, sl);
+			convert<unsigned short, unsigned long int>(us, ul);
+		}
+		if(sizeof(short) < sizeof(long long int))
+		{
+			signed short ss = 0;
+			unsigned short us = 0;
+			signed long long int sll = 0;
+			unsigned long long int ull = 0;
+
+			convert<signed short, signed long long int>(ss, sll);
+			convert<signed short, unsigned long long int>(ss, ull);
+			convert<unsigned short, signed long long int>(us, sll);
+			convert<unsigned short, unsigned long long int>(us, ull);
+		}
+
+		// convert int to longer integer
+		if(sizeof(int) < sizeof(long int))
+		{
+			signed int si = 0;
+			unsigned int ui = 0;
+			signed long int sl = 0;
+			unsigned long int ul = 0;
+
+			convert<signed int, signed long int>(si, sl);
+			convert<signed int, unsigned long int>(si, ul);
+			convert<unsigned int, signed long int>(ui, sl);
+			convert<unsigned int, unsigned long int>(ui, ul);
+		}
+		if(sizeof(int) < sizeof(long long int))
+		{
+			signed int si = 0;
+			unsigned int ui = 0;
+			signed long long int sll = 0;
+			unsigned long long int ull = 0;
+
+			convert<signed int, signed long long int>(si, sll);
+			convert<signed int, unsigned long long int>(si, ull);
+			convert<unsigned int, signed long long int>(ui, sll);
+			convert<unsigned int, unsigned long long int>(ui, ull);
+		}
+
+		// convert long int to longer integer
+		if(sizeof(long int) < sizeof(long long int))
+		{
+			signed long int sl = 0;
+			unsigned long int ul = 0;
+			signed long long int sll = 0;
+			unsigned long long int ull = 0;
+
+			convert<signed long int, signed long long int>(sl, sll);
+			convert<signed long int, unsigned long long int>(sl, ull);
+			convert<unsigned int, signed long long int>(ul, sll);
+			convert<unsigned int, unsigned long long int>(ul, ull);
+		}
+	}
+#endif
+
+	//***********************************  Correspond Convertion ******************************************
+#ifdef _CORRESPOND	
+	if (num_input == 2 || num_input == 4)
+	{
+		fout<<"***********************************  Correspond Convertion ******************************************"<<endl;
+		// convert char to correspond integer
+		{
+
+			convert<signed char, unsigned char>();
+			convert<unsigned char, signed char>();
+		}
+		if(sizeof(char) == sizeof(short))
+		{
+			convert<signed char, signed short>();
+			convert<signed char, unsigned short>();
+			convert<unsigned char, signed short>();
+			convert<unsigned char, unsigned short>();
+		}
+		if(sizeof(char) == sizeof(int))
+		{
+
+			convert<signed char, signed int>();
+			convert<signed char, unsigned int>();
+			convert<unsigned char, signed int>();
+			convert<unsigned char, unsigned int>();
+		}
+		if(sizeof(char) == sizeof(long int))
+		{
+
+
+			convert<signed char, signed long int>();
+			convert<signed char, unsigned long int>();
+			convert<unsigned char, signed long int>();
+			convert<unsigned char, unsigned long int>();
+		}
+		if(sizeof(char) == sizeof(long long int))
+		{
+
+
+			convert<signed char, signed long long int>();
+			convert<signed char, unsigned long long int>();
+			convert<unsigned char, signed long long int>();
+			convert<unsigned char, unsigned long long int>();
+		}
+
+		// convert short to correspond integer
+		{
+
+			convert<signed short, unsigned short>();
+			convert<unsigned short, signed short>();
+		}
+		if(sizeof(short) == sizeof(int))
+		{
+
+
+			convert<signed short, signed int>();
+			convert<signed short, unsigned int>();
+			convert<unsigned short, signed int>();
+			convert<unsigned short, unsigned int>();
+		}
+		if(sizeof(short) == sizeof(long int))
+		{
+
+			convert<signed short, signed long int>();
+			convert<signed short, unsigned long int>();
+			convert<unsigned short, signed long int>();
+			convert<unsigned short, unsigned long int>();
+		}
+		if(sizeof(short) == sizeof(long long int))
+		{
+			convert<signed short, signed long long int>();
+			convert<signed short, unsigned long long int>();
+			convert<unsigned short, signed long long int>();
+			convert<unsigned short, unsigned long long int>();
+		}
+
+		// convert int to correspond integer
+		{
+
+			convert<signed int, unsigned int>();
+			convert<unsigned int, signed int>();
+		}
+		if(sizeof(int) == sizeof(long int))
+		{
+			convert<signed int, signed long int>();
+			convert<signed int, unsigned long int>();
+			convert<unsigned int, signed long int>();
+			convert<unsigned int, unsigned long int>();
+		}
+		if(sizeof(int) == sizeof(long long int))
+		{
+			convert<signed int, signed long long int>();
+			convert<signed int, unsigned long long int>();
+			convert<unsigned int, signed long long int>();
+			convert<unsigned int, unsigned long long int>();
+		}
+
+		// convert long int to correspond integer
+		{
+
+			convert<signed long, unsigned long>();
+			convert<unsigned long, signed long>();
+		}
+		if(sizeof(long int) == sizeof(long long int))
+		{
+			convert<signed long int, signed long long int>();
+			convert<signed long int, unsigned long long int>();
+			convert<unsigned int, signed long long int>();
+			convert<unsigned int, unsigned long long int>();
+		}
+
+		// convert long long int to correspond integer
+		{
+			convert<signed long long, unsigned long long>();
+			convert<unsigned long long, signed long long>();
+		}
+	}
+#endif
+
+	//***********************************  Converting to shorter ********************************************
+#ifdef _CONVERTING_SHORTER
+	if (num_input == 3 || num_input == 4)
+	{
+		fout<<"***********************************  Converting to shorter ********************************************"<<endl;
+		// convert longer integer to char
+		if(sizeof(char) < sizeof(short))
+		{
+
+			convert<signed short ,signed char>();
+			convert<unsigned short , signed char>();
+			convert<signed short ,unsigned char>();
+			convert<unsigned short ,unsigned char >();
+		}
+		if(sizeof(char) < sizeof(int))
+		{
+
+			convert<signed int , signed char >();
+			convert<unsigned int , signed char>();
+			convert<signed int , unsigned char >();
+			convert<unsigned int , unsigned char>();
+		}
+		if(sizeof(char) < sizeof(long int))
+		{
+			convert<signed long int , signed char>();
+			convert<unsigned long int , signed char>();
+			convert<signed long int , unsigned char>();
+			convert<unsigned long int , unsigned char>();
+		}
+		if(sizeof(char) < sizeof(long long int))
+		{
+			convert<signed long long int , signed char >();
+			convert<unsigned long long int , signed char>();
+			convert<signed long long int , unsigned char>();
+			convert<unsigned long long int , unsigned char>();
+		}
+
+		// convert short to longer integer
+		if(sizeof(short) < sizeof(int))
+		{
+
+			convert<signed int , signed short>();
+			convert<unsigned int , signed short>();
+			convert<signed int , unsigned short>();
+			convert<unsigned int , unsigned short>();
+		}
+		if(sizeof(short) < sizeof(long int))
+		{
+
+			convert<signed long int , signed short>();
+			convert<unsigned long int , signed short>();
+			convert<signed long int , unsigned short>();
+			convert<unsigned long int , unsigned short>();
+		}
+		if(sizeof(short) < sizeof(long long int))
+		{
+			convert<signed long long int , signed short>();
+			convert<unsigned long long int , signed short>();
+			convert<signed long long int , unsigned short>();
+			convert<unsigned long long int , unsigned short>();
+		}
+
+		// convert longer integer to int
+		if(sizeof(int) < sizeof(long int))
+		{
+
+			convert<signed long int , signed int>();
+			convert<unsigned long int , signed int>();
+			convert<signed long int , unsigned int>();
+			convert<unsigned long int , unsigned int>();
+		}
+		if(sizeof(int) < sizeof(long long int))
+		{
+
+			convert<signed long long int , signed int>();
+			convert<unsigned long long int , signed int>();
+			convert<signed long long int , unsigned int>();
+			convert<unsigned long long int , unsigned int>();
+		}
+
+		// convert longer integer to long int
+		if(sizeof(long int) < sizeof(long long int))
+		{
+			convert< signed long long int , signed long int>();
+			convert<unsigned long long int , signed long int>();
+			convert<signed long long int, unsigned int>();
+			convert<unsigned long long int , unsigned int>();
+		}
+	}
+#endif	
+
+	if(num_input !=1 && num_input !=2 && num_input !=3 && num_input !=4)
+		cout<<"Please input currect value"<<endl;
+
+	system("pause");
+	return 0;
+}
