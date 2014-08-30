@@ -1,0 +1,183 @@
+#include <iostream>
+#include <fstream>
+#include <typeinfo>
+#include <bitset>
+#include <limits.h>
+#include <limits>
+#include <string>
+#include <time.h>
+#include <cmath>
+#include <cstdint>
+
+using namespace std;
+
+static unsigned int Num_Sample = 0;
+static ofstream fout ("Result_Conver.txt",ios::out);
+
+//#define _Print_To_Cmd
+
+template<class T>
+T eg_rand()
+{
+	static unsigned int seed = time(NULL);
+	srand(seed);
+	for(unsigned int i=0; i<rand()%10; i++)
+		rand();
+
+	seed = rand();
+	if(sizeof(T) == sizeof(int))
+	{
+		return seed;
+	}
+	else if(sizeof(T) < sizeof(int))
+	{
+		return seed % numeric_limits<T>::max();
+	}
+	else
+	{
+		T result = 0;
+		for(unsigned int i=0; i<sizeof(T)/sizeof(int); i++)
+		{
+			result<<(sizeof(int)*8);
+			result += seed;
+		}
+		return result;
+	}
+}
+
+template <class T>
+void print_binary(T var)
+{
+	char* bits = reinterpret_cast<char*>(&var);
+	for(std::size_t n=sizeof(T); n!=0; --n)
+	{
+#ifdef _Print_To_Cmd
+		cout<<std::bitset<8>(bits[n-1])<<'-';
+#endif
+		fout<<std::bitset<8>(bits[n-1])<<'-';
+	}
+#ifdef _Print_To_Cmd
+	cout<<endl;
+#endif
+	fout<<endl;
+}
+
+template <class T1,class T2>
+void Print(T1 from , T2 to,char * explain=" ")
+{
+#ifdef 	_Print_To_Cmd
+	cout<<"_______________________________________________________________________________________________________"<<endl;
+	Num_Sample++;
+	cout<<"NO.Sample : "<<Num_Sample<<endl;
+	cout<<"Your input number had size of "<<sizeof(T1)<<" Byte"<<endl;
+	cout<<"Your output number had size of "<<sizeof(T2)<<" Byte"<<endl;
+	cout<<"Conver "<<explain<<"  "<<typeid(T1).name()<<" To "<<typeid(T2).name()<<endl;
+	cout<<typeid(T1).name()<<" : "<<from<<" >>>> Convert To >>>>>> "<<typeid(T2).name()<<" : "<<to<<endl;	
+#endif
+	//*********************** Printing in file ****************************
+
+	fout<<"_______________________________________________________________________________________________________"<<endl;
+	fout<<"NO.Sample : "<<Num_Sample<<endl;
+	fout<<"Your input number had size of "<<sizeof(T1)<<" Byte"<<endl;
+	fout<<"Your output number had size of "<<sizeof(T2)<<" Byte"<<endl;
+	fout<<"Conver "<<explain<<"  "<<typeid(T1).name()<<" To "<<typeid(T2).name()<<endl;
+	fout<<typeid(T1).name()<<" : "<<from<<" >>>> Convert To >>>>>> "<<typeid(T2).name()<<" : "<<to<<endl;
+
+	//*********************** Printing Binary *****************************
+
+	print_binary(from);
+	fout<<endl;
+	print_binary(to);
+	fout<<endl;
+
+	fout<<"_______________________________________________________________________________________________________"<<endl;
+#ifdef 	_Print_To_Cmd
+	cout<<"_______________________________________________________________________________________________________"<<endl;
+#endif
+}
+
+template<class T1,class T2>
+T2 convert(T1 from=0, T2 to=0) 
+{
+	/*if(flag == true)
+	{
+	to = from;
+	Print<T1,T2>(from,to);
+	return to;
+	}*/
+	from = numeric_limits<T1>::min();
+	to = from;
+	Print<T1,T2>(from,to," Min ");
+
+	from = numeric_limits<T1>::max();
+	to = from;
+	Print<T1,T2>(from,to," Max ");
+
+	from = numeric_limits<T1>::infinity();
+	to = from;
+	Print<T1,T2>(from,to," Infinity ");
+
+	from = numeric_limits<T1>::epsilon();
+	to = from;
+	Print<T1,T2>(from,to," Epsilon ");
+
+	from = numeric_limits<T1>::quiet_NaN();
+	to = from;
+	Print<T1,T2>(from,to," quiet NAN");
+
+	from = numeric_limits<T1>::signaling_NaN();
+	to = from;
+	Print<T1,T2>(from,to," signaling NAN");
+
+	/*from = eg_rand<T1>();
+	to = from;
+	Print<T1,T2>(from,to," Random ");*/
+	return to;
+}
+
+int main()
+{
+	fout<<"size of float : "<<sizeof(float)<<endl;
+	fout<<"size of double : "<<sizeof(double)<<endl;
+	fout<<"size of long double : "<<sizeof(long double)<<endl;
+
+	fout<<"*************************************************************************"<<endl;
+	fout<<"                               Converting Float to . . . .. . .          "<<endl;
+	fout<<"**************************************************************************"<<endl;
+
+	if(sizeof(float) < sizeof(double))
+		convert<float, double>();
+
+	if(sizeof(float) < sizeof(long double))
+		convert<float, long double>();
+
+	cout<<"Converting Float are Completed"<<endl;
+
+	fout<<"**************************************************************************"<<endl;
+	fout<<"                               Converting Double to . . . .. . .          "<<endl;
+	fout<<"**************************************************************************"<<endl;
+
+	if(sizeof(float) < sizeof(double))
+		convert<double, float>();
+
+	if(sizeof(double) < sizeof(long double))
+		convert<double, long double>();
+
+	cout<<"Converting Double are Completed"<<endl;
+
+    fout<<"**************************************************************************"<<endl;
+	fout<<"                              Converting Long Double to . . . . . . .    "<<endl;
+	fout<<"**************************************************************************"<<endl;
+
+	if(sizeof(float) < sizeof(long double))
+		convert<long double, float>();
+
+	if(sizeof(double) < sizeof(long double))
+		convert<long double, double>();
+
+	cout<<"Converting Long Double are Completed"<<endl;
+
+	cout<<"To watch the output please study Result_Conver.txt in the current directory "<<endl<<endl;
+	system("pause");
+	return 0;
+}
